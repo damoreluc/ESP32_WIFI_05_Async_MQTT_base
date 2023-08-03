@@ -253,16 +253,6 @@ void setup()
 
 void loop()
 {
-  // // monitor WiFi status
-  // if (WiFi.isConnected())
-  // {
-  //   digitalWrite(pinWiFiConnected, HIGH);
-  // }
-  // else
-  // {
-  //   digitalWrite(pinWiFiConnected, LOW);
-  // }
-
   // Update the Bounce instance (YOU MUST DO THIS EVERY LOOP)
   button.update();
 

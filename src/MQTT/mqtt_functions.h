@@ -11,12 +11,6 @@
  * 
  *****************************************************************************/
 
-// extern "C"
-// {
-// #include "freertos/FreeRTOS.h"
-// #include "freertos/timers.h"
-// }
-
 // Manage list of subscribed topics
 // topic to subscribe
 const uint8_t MAX_TOPIC_NAME = 100;

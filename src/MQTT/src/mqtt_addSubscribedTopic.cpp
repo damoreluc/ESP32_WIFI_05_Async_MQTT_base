@@ -2,16 +2,6 @@
 
 // Manage list of subscribed topics
 // topic to subscribe
-// const uint8_t MAX_TOPIC_NAME = 100;
-
-// typedef struct tSubTopic
-// {
-//   char topic[MAX_TOPIC_NAME + 1];
-//   uint8_t qos;
-//   uint16_t pktId;
-//   tSubTopic *next;
-// } tSubTopic;
-
 tSubTopic *pListOfTopics = NULL;
 
 // add a new topic to the subscribed list (return TRUE on success)
