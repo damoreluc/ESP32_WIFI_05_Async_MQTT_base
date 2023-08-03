@@ -46,13 +46,13 @@ ed è possibile aggiungerne altri rispettando il formato del file ed il nome del
 
 ```C
 #ifndef __NOMEBROKER_H
-   #define __NOMEBROKER_H
-     // parametri di accesso per il broker NOMEBROKER MQTT
-     const char *mqttServer = "IP_o_url_del_broker_MQTT";
-     const int mqttPort = 1883;
-     const char *mqttUser = "eventuale_username_di_accesso_al_broker";
-     const char *mqttPassword = "eventuale_password_di_accesso_al_broker";
-   #endif
+#define __NOMEBROKER_H
+  // parametri di accesso per il broker NOMEBROKER MQTT
+  const char *mqttServer = "IP_o_url_del_broker_MQTT";
+  const int mqttPort = 1883;
+  const char *mqttUser = "eventuale_username_di_accesso_al_broker";
+  const char *mqttPassword = "eventuale_password_di_accesso_al_broker";
+#endif
 ```
 
 Nel file `main.cpp` includere __il solo__ file prescelto di accesso al broker, ad esempio:
