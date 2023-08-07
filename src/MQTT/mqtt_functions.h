@@ -40,7 +40,7 @@ bool AddSubscribedTopic(const char* topic, uint8_t qos);
 // set RTOS timers to handle automatic reconnection to MQTT broker
 void setTimersRTOS(uint16_t timeout_ms);
 
-// start RTOS timer to hancle automatic reconnection to MQTT broker
+// start RTOS timer to handle automatic reconnection to MQTT broker
 void startTimersRTOS();
 
 // ensure we don't reconnect to MQTT while reconnecting to Wi-Fi
