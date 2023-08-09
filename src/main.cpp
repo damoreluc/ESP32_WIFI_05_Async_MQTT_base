@@ -208,6 +208,7 @@
 
 // altre librerie richieste dalla applicazione specifica
 #include <Bounce2.h>
+#include <APPLICATION/application.h>
 
 // your MQTT Broker:
 // uncomment one of following #include to set the MQTT broker.
@@ -226,15 +227,21 @@ void setup()
   // configura tre led di prova comandati tramite messaggi MQTT
   // l'interpretazione dei messaggi e l'esecuzione dei comandi
   // viene svolta nel file MQTT/custom/parseMessage.cpp  (da personalizzare)
-  pinMode(pinYellow, OUTPUT);
+  pinMode(pinGreen, OUTPUT);
   pinMode(pinRed, OUTPUT);
   pinMode(pinBlue, OUTPUT);
 
-  // // comanda un led per indicare la connessione all'access point WiFi
-  // pinMode(pinWiFiConnected, OUTPUT);
+  // configurazione pwm per il led RGB
+  configPWM(channelGreen, pinGreen);
+  configPWM(channelRed, pinRed);  
+  configPWM(channelBlue, pinBlue);
+  setDutyCycle(channelGreen, 0);
+  setDutyCycle(channelRed, 0); 
+  setDutyCycle(channelBlue, 0); 
 
   // configura un ingresso digitale come pulsante gestito da Bounce2.h
   button.attach(pinButton, INPUT_PULLUP);
+
 
   // impiega il metodo macAddress() dell'oggetto WiFi
   Serial.println();
