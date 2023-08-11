@@ -6,8 +6,15 @@
  * 
  * Impiega la libreria AsyncMqttClient.
  * 
- * L'esempio accetta quattro subscribed topics (tre per rispettivi tre led, più un topic di testo)
- * e pubblica un topic con lo stato di un pulsante.
+ * L'esempio accetta quattro subscribed topics:
+ *  ESP32_base/yellowTopic  per il comando del led giallo
+ *  ESP32_base/redTopic     per il comando del led rosso
+ *  ESP32_base/blueTopic    per il comando del led blu 
+ *  ESP32_base/input        per la stampa di un messaggio di testo sulla console seriale
+ * 
+ * e pubblica sul topic:
+ *  ESP32_base/output
+ * un testo che rappresenta lo stato attuale di un pulsante.
  * 
  * CONFIGURAZIONE WIFI ------------------------------------------------------------------------------
  * La scheda ESP32 è configurata come STATION in una rete WiFi: 

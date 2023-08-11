@@ -6,7 +6,24 @@ Impiega la libreria `AsyncMqttClient` (link: https://github.com/OttoWinter/async
 
 (vedi anche https://github.com/khoih-prog/AsyncMQTT_ESP32 con documentazione più completa)
 
-L'esempio accetta quattro subscribed topics (tre per rispettivi tre led, più un topic di testo) e pubblica un topic con lo stato di un pulsante.
+L'esempio accetta quattro subscribed topics:
+
+* `ESP32_base/yellowTopic`  per il comando del led giallo
+* `ESP32_base/redTopic`  per il comando del led rosso
+* `ESP32_base/blueTopic`  per il comando del led blu 
+* `ESP32_base/input`    per la stampa di un messaggio di testo sulla console seriale
+
+e pubblica sul topic:
+
+* `ESP32_base/output`
+
+un testo che rappresenta lo stato attuale di un pulsante.
+
+---
+
+## Cartella `\APPLICATION`
+
+La cartella `\APPLICATION` è pensata per organizzare meglio il codice del progetto.<br>Inserire qui le funzioni ausiliarie specifiche per l'applicazione in sviluppo, ad esempio le callback di accensione e spegnimento dei led in funzione del contenuto del payload.
 
 ---
 
@@ -108,9 +125,9 @@ La personalizzazione va svolta nel file `MQTT\custom\mqtt_topics.cpp`
 
 __Procedere nell'ordine:__
 
-1. definire quali informazioni la scheda ESP32 dovrà ricevere dal broker e associare i subscribed topics, definendo un nome univoco per ciascun topic e il suo percorso sul broker.<br>
+1. definire quali informazioni la scheda ESP32 dovrà ricevere dal broker e associare i subscribed topics, definendo un nome univoco (chiave) per ciascun topic e il suo percorso sul broker.<br>
 Ad esempio: si vuole accendere/spegnere da remoto un led giallo collegato alla ESP32;
-    * si definisce il _subscribed topic_ con nome `"yellowTopic"`
+    * si definisce il _subscribed topic_ con nome (chiave) `"yellowOnOffTopic"`
     * con percorso  `"ESP32_base/yellowTopic"` 
     * da questo topic arriverà la stringa `"0"` per spegnere il led, o la stringa `"1"` per accenderlo.
 
@@ -124,7 +141,7 @@ Ad esempio: si vuole notificare in remoto che un pulsante è stato premuto o ril
 
 ```C
    // subscribed topic di comando del led giallo  
-   subTopics.set("yellowTopic", thisClient "/yellowTopic");
+   subTopics.set("yellowOnOffTopic", thisClient "/yellowTopic");
 ```
 
 4. ripetere il punto 3. per ciascun _subscribed topic_ richiesto dalla applicazione
@@ -151,27 +168,55 @@ va personalizzata la funzione    `parseMessage()`
 
 Rifacendosi al caso del led giallo illustrato più sopra, nella `parseMessage()` si andrà a:
 
-1. verificare se si tratta del __topic__ descritto dalla chiave `"yellowTopic"` allora si valuta il contenuto del payload
-2. se il __payload__ è la stringa `"0"` viene comandato lo spegnimento del led giallo altrimenti se il __payload__ è la stringa `"1"` viene comandata l'accensione del led giallo.
+1. verificare se si tratta del __topic__ descritto dalla chiave `"yellowOnOffTopic"` allora si passa il contenuto del payload alla funzione ausiliaria __programmata dallo sviluppatore__ che gestirà l'informazione:
+
+```C
+// operazioni da eseguire quando viene ricevuto un messaggio
+// viene richiamata da mqtt_onMqttMessage()
+void parseMessage(char *topic, char *payload, AsyncMqttClientMessageProperties properties, size_t len, size_t index, size_t total)
+{
+    // bonifica del payload
+    // estrae solo i primi len caratteri del payload
+    char data[len + 1];
+    strncpy(data, payload, len);
+
+    // print some information about the received message
+    printRcvMsg(topic, payload, properties, len, index, total);
+
+    // da personalizzare
+
+    // comando del led giallo
+    // è arrivato un messaggio da yellowOnOffTopic
+    if (strcmp(topic, subscribedTopics.get("yellowOnOffTopic").c_str()) == 0)
+    {
+        // comanda on/off led giallo a partire dal payload
+        driveOnOffYellow(data);
+    }
+}
+```
+
+2. nella funzione ausiliaria, se il __payload__ è la stringa `"0"` viene comandato lo spegnimento del led giallo altrimenti se il __payload__ è la stringa `"1"` viene comandata l'accensione del led giallo.
 
 La struttura del codice corrispondente è:
 
 ```C
-  // comando del led giallo
-  // è arrivato un messaggio da yellowTopic
-  if (strcmp(topic, subscribedTopics.get("yellowTopic").c_str()) == 0)
-  {
-    if (strncmp(payload, "0", 1) == 0)
+#include <APPLICATION/application.h>
+#include <HWCONFIG/hwConfig.h>
+
+// comanda on/off led giallo a partire dal payload
+void driveOnOffYellow(char *data)
+{
+    if (strncmp(data, "0", 1) == 0)
     {
-      digitalWrite(pinYellow, LOW);
-      Serial.println("led giallo spento");
+        digitalWrite(pinYellow, LOW);
+        Serial.println("led giallo spento");
     }
-    else if (strncmp(payload, "1", 1) == 0)
+    else if (strncmp(data, "1", 1) == 0)
     {
-      digitalWrite(pinYellow, HIGH);
-      Serial.println("led giallo acceso");
+        digitalWrite(pinYellow, HIGH);
+        Serial.println("led giallo acceso");
     }
-  }
+}
 ```
 
 __NOTA__: nelle operazioni di confronto tra stringhe del payload (trattate come _array di char_) è consigliato utilizzare la funzione di confronto `strncmp()` specificando esattamente il numero di caratteri da confrontare.
