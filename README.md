@@ -1,12 +1,34 @@
-# WiFi Esempio 05: <br>template di client MQTT con connessione a rete WiFi
+# WiFi Esempio 05: <br>controllo led RGB da client MQTT con connessione a rete WiFi
 
-Il progetto è un modello base per realizzare un client MQTT. Va considerato come riferimento per progetti più articolati basati sul protocollo MQTT su ESP32.
+Il progetto realizza il controllo del colore di un led RGB tramite il client MQTT. Va considerato come riferimento per progetti più articolati basati sul protocollo MQTT su ESP32.
 
 Impiega la libreria `AsyncMqttClient` (link: https://github.com/OttoWinter/async-mqtt-client)
 
 (vedi anche https://github.com/khoih-prog/AsyncMQTT_ESP32 con documentazione più completa)
 
-L'esempio accetta quattro subscribed topics (tre per rispettivi tre led, più un topic di testo) e pubblica un topic con lo stato di un pulsante.
+L'esempio accetta due subscribed topics:
+
+* `ESP32_base/rgb/pwm`  per il controllo del led RGB
+* `ESP32_base/input`    per la stampa di un messaggio di testo sulla console seriale
+
+e pubblica sul topic:
+
+* `ESP32_base/output`
+
+un testo che rappresenta lo stato attuale di un pulsante.
+
+Il controllo del led RGB richiede che venga specificato un valore numerico a 24 bit:
+
+* gli 8 bit più significativi rappresentano l'intensità del rosso (da 0 a 255)
+* gli 8 bit intermedi stabiliscono l'intensità del verde
+* gli 8 bit meno significativi definiscono l'intensità del blu
+
+Il dato arriverà nel payload come sequenza di 6 caratteri che rappresentano cifre esadecimali. Ad esempio:
+
+* FF0000 indica il colore rosso
+* FFFF00 indica il colore giallo
+
+Una volta ricavato il valore di ciascun colore primario (R, G, B) lo si utilizza per modificare il duty cycle di tre generatori PWM che comandano gli anodi del led RGB.
 
 ---
 
@@ -110,7 +132,7 @@ __Procedere nell'ordine:__
 
 1. definire quali informazioni la scheda ESP32 dovrà ricevere dal broker e associare i subscribed topics, definendo un nome univoco per ciascun topic e il suo percorso sul broker.<br>
 Ad esempio: si vuole accendere/spegnere da remoto un led giallo collegato alla ESP32;
-    * si definisce il _subscribed topic_ con nome `"yellowTopic"`
+    * si definisce il _subscribed topic_ con nome `"yellowOnOffTopic"`
     * con percorso  `"ESP32_base/yellowTopic"` 
     * da questo topic arriverà la stringa `"0"` per spegnere il led, o la stringa `"1"` per accenderlo.
 
@@ -124,7 +146,7 @@ Ad esempio: si vuole notificare in remoto che un pulsante è stato premuto o ril
 
 ```C
    // subscribed topic di comando del led giallo  
-   subTopics.set("yellowTopic", thisClient "/yellowTopic");
+   subTopics.set("yellowOnOffTopic", thisClient "/yellowTopic");
 ```
 
 4. ripetere il punto 3. per ciascun _subscribed topic_ richiesto dalla applicazione
@@ -151,27 +173,55 @@ va personalizzata la funzione    `parseMessage()`
 
 Rifacendosi al caso del led giallo illustrato più sopra, nella `parseMessage()` si andrà a:
 
-1. verificare se si tratta del __topic__ descritto dalla chiave `"yellowTopic"` allora si valuta il contenuto del payload
-2. se il __payload__ è la stringa `"0"` viene comandato lo spegnimento del led giallo altrimenti se il __payload__ è la stringa `"1"` viene comandata l'accensione del led giallo.
+1. verificare se si tratta del __topic__ descritto dalla chiave `"yellowOnOffTopic"` allora si passa il contenuto del payload alla funzione ausiliaria __programmata dallo sviluppatore__ che gestirà l'informazione:
+
+```C
+// operazioni da eseguire quando viene ricevuto un messaggio
+// viene richiamata da mqtt_onMqttMessage()
+void parseMessage(char *topic, char *payload, AsyncMqttClientMessageProperties properties, size_t len, size_t index, size_t total)
+{
+    // bonifica del payload
+    // estrae solo i primi len caratteri del payload
+    char data[len + 1];
+    strncpy(data, payload, len);
+
+    // print some information about the received message
+    printRcvMsg(topic, payload, properties, len, index, total);
+
+    // da personalizzare
+
+    // comando del led giallo
+    // è arrivato un messaggio da yellowOnOffTopic
+    if (strcmp(topic, subscribedTopics.get("yellowOnOffTopic").c_str()) == 0)
+    {
+        // comanda on/off led giallo a partire dal payload
+        driveOnOffYellow(data);
+    }
+}
+```
+
+2. nella funzione ausiliaria, se il __payload__ è la stringa `"0"` viene comandato lo spegnimento del led giallo altrimenti se il __payload__ è la stringa `"1"` viene comandata l'accensione del led giallo.
 
 La struttura del codice corrispondente è:
 
 ```C
-  // comando del led giallo
-  // è arrivato un messaggio da yellowTopic
-  if (strcmp(topic, subscribedTopics.get("yellowTopic").c_str()) == 0)
-  {
-    if (strncmp(payload, "0", 1) == 0)
+#include <APPLICATION/application.h>
+#include <HWCONFIG/hwConfig.h>
+
+// comanda on/off led giallo a partire dal payload
+void driveOnOffYellow(char *data)
+{
+    if (strncmp(data, "0", 1) == 0)
     {
-      digitalWrite(pinYellow, LOW);
-      Serial.println("led giallo spento");
+        digitalWrite(pinYellow, LOW);
+        Serial.println("led giallo spento");
     }
-    else if (strncmp(payload, "1", 1) == 0)
+    else if (strncmp(data, "1", 1) == 0)
     {
-      digitalWrite(pinYellow, HIGH);
-      Serial.println("led giallo acceso");
+        digitalWrite(pinYellow, HIGH);
+        Serial.println("led giallo acceso");
     }
-  }
+}
 ```
 
 __NOTA__: nelle operazioni di confronto tra stringhe del payload (trattate come _array di char_) è consigliato utilizzare la funzione di confronto `strncmp()` specificando esattamente il numero di caratteri da confrontare.

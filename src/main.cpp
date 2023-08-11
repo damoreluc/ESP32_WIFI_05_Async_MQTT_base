@@ -1,13 +1,32 @@
 /*
- * WiFi Esempio 05: template di client MQTT con connessione a rete WiFi
- *
- * Il progetto è un modello base per realizzare un client MQTT. Va considerato come riferimento
- * per progetti più articolati basati sul protocollo MQTT su ESP32.
+ * WiFi Esempio 05: <br>controllo led RGB da client MQTT con connessione a rete WiFi
  * 
- * Impiega la libreria AsyncMqttClient.
+ * Il progetto realizza il controllo del colore di un led RGB tramite il client MQTT. 
+ * Va considerato come riferimento per progetti più articolati basati sul protocollo MQTT su ESP32.
  * 
- * L'esempio accetta quattro subscribed topics (tre per rispettivi tre led, più un topic di testo)
- * e pubblica un topic con lo stato di un pulsante.
+ * Impiega la libreria `AsyncMqttClient` (link: https://github.com/OttoWinter/async-mqtt-client)
+ * (vedi anche https://github.com/khoih-prog/AsyncMQTT_ESP32 con documentazione più completa)
+ * 
+ * L'esempio accetta due subscribed topics:
+ *   ESP32_base/rgb/pwm  per il controllo del led RGB
+ *   ESP32_base/input    per la stampa di un messaggio di testo sulla console seriale
+ * 
+ * e pubblica sul topic:
+ *   ESP32_base/output`
+ * un testo che rappresenta lo stato attuale di un pulsante.
+ * 
+ * Il controllo del led RGB richiede che venga specificato un valore numerico a 24 bit:
+ *  gli 8 bit più significativi rappresentano l'intensità del rosso (da 0 a 255)
+ *  gli 8 bit intermedi stabiliscono l'intensità del verde
+ *  gli 8 bit meno significativi definiscono l'intensità del blu
+ * 
+ * Il dato arriverà nel payload come sequenza di 6 caratteri che rappresentano cifre esadecimali. 
+ * Ad esempio:
+ *  FF0000 indica il colore rosso
+ *  FFFF00 indica il colore giallo
+ * 
+ * Una volta ricavato il valore di ciascun colore primario (R, G, B) lo si utilizza per modificare
+ * il duty cycle di tre generatori PWM che comandano gli anodi del led RGB.
  * 
  * CONFIGURAZIONE WIFI ------------------------------------------------------------------------------
  * La scheda ESP32 è configurata come STATION in una rete WiFi: 
@@ -45,148 +64,6 @@
  *    // #include <MQTT/broker/mosquitto.h>
  * 
  * IMPORTANTE: NON includere più di un file di definizione del broker
- * 
- * 
- * DEFINIZIONE DEI SUBSCRIBED E DEI PUBLISHING TOPICS ------------------------------------------
- * 
- * In base all'applicazione da creare, vanno definiti i topics a cui il client deve iscriversi 
- * per ricevere dati o comandi da remoto.
- * 
- * Il client MQTT deve possedere un nome univoco sul broker.
- * Nel file MQTT\custom\mqtt_topics.h
- * viene dichiarato il nome univoco, che è possibile personalizzare:
- *    // MQTT client ID
- *    #define thisClient "ESP32_base"
- * 
- * 
- * Vanno poi definiti i topic sui quali il client pubblica dati verso il broker.
- * Allo scopo vengono impiegati due dizionari:
- *   per i subscribed topics ("ingressi" per il client):  subscribedTopics
- *   per i publishing topics ("uscite" del client):  publishedTopics
- * 
- * entrambi i dizionari hanno la struttura:  <chiave>, <valore>
- * entrambe le voci sono di tipo String.
- * Con <chiave> si indica un nome semplice da assegnare al topic
- * Il <valore> contiene il persorso logico del topic.
- * 
- * 
- * La personalizzazione va svolta nel file MQTT\custom\mqtt_topics.cpp
- * Per i topic in ingresso modificare la funzione:
- *    void compileSubTopics(Dictionary<String, String> &subTopics)
- * 
- * Per i topic in uscita modificare la funzione:
- *    void compilePubTopics(Dictionary<String, String> &pubTopics)
- * 
- * 
- * Procedere nell'ordine:
- * 1. definire quali informazioni la scheda ESP32 dovrà ricevere dal broker
- *    e associare i subscribed topics, definendo un nome univoco per ciascun topic
- *    e il suo percorso sul broker. Ad esempio:
- *      si vuole accendere/spegnere da remoto un led giallo collegato alla ESP32;
- *      si definisce un subscribed topic con nome "yellowTopic"
- *      e con percorso  "ESP32_base/yellowTopic" 
- *      da questo topic arriverà la stringa "0" per spegnere il led, o la stringa "1" per
- *      accenderlo.
- * 
- * 2. in modo simile, definire quali informazioni la scheda ESP32 pubblicherà verso il broker
- *    e associare i publisher topics, definendo un nome univoco per ciascun topic
- *    e il suo percorso sul broker. Ad esempio:
- *      si vuole notificare in remoto che un pulsante è stato premuto o rilasciato;
- *      si definisce un published topic con nome "outTopic"
- *      e con percorso  "ESP32_base/output"
- *      su questo topic la ESP32 invierà un messaggio sullo stato del pulsante
- * 
- * 3. per i subscribed topics, nella funzione compilePubTopics() aggiungere il topic al dizionario 
- *    dei subscribed topics mediante il comando:
- *      // subscribed topic di comando del led giallo  
- *      subTopics.set("yellowTopic", thisClient "/yellowTopic");
- * 
- * 4. ripetere il punto 3. per ciascun subscribed topic richiesto dalla applicazione 
- * 
- * 5. per i publishing topic, nella funzione compilePubTopics() aggiungere il topic al dizionario 
- *    dei published topics mediante il comando:
- *      // topic di pubblicazione messaggi
- *      pubTopics.set("outTopic", thisClient "/output");
- * 
- * 6. ripetere il punto 5. per ciascun published topic richiesto dalla applicazione.
- * 
- * All'avvio del client MQTT verranno automaticamente registrati sul broker i subscribed topics.
- * 
- * 
- * PARSING DEI SUBSCRIBED TOPICS ---------------------------------------------------------------
- * Il client MQTT gestisce il traffico col broker in modo asincrono, non è necessario che 
- * il programmatore della applicazione si preoccupi delle fasi di ricezione o di trasmissione
- * dei dati sui topics.
- * 
- * E' invece responsabilità del programmatore decidere cosa fare quando viene ricevuto un messaggio
- * su un subscribed topic. 
- * Nel file     MQTT\custom\parseMessage.cpp 
- * va personalizzata la funzione    parseMessage()
- * 
- * Rifacendosi al caso del led giallo illustrato più sopra, nella parseMessage() si andrà a 
- * 1. verificare il topic del messaggio ricevuto
- * 2. se si tratta del topic descritto dalla chiave "yellowTopic" allora si valuta il contenuto del payload
- * 3. se il payload è la stringa "0" viene comandato lo spegnimento del led giallo
- *    altrimenti se il payload è la stringa "1" viene comandata l'accensione del led giallo
- * 
- * La struttura del codice corrispondente è:
- * 
- *  // comando del led giallo
- *  // è arrivato un messaggio da yellowTopic
- *  if (strcmp(topic, subscribedTopics.get("yellowTopic").c_str()) == 0) 
- *  {
- *    if (strncmp(payload, "0", 1) == 0)
- *    {
- *      digitalWrite(pinYellow, LOW);
- *      Serial.println("led giallo spento");
- *    }
- *    else if (strncmp(payload, "1", 1) == 0)
- *    {
- *      digitalWrite(pinYellow, HIGH);
- *      Serial.println("led giallo acceso");
- *    }
- *  }
- * 
- * NOTA: nelle operazioni di confronto tra stringhe del payload (trattate come array di char)
- *       è consigliato utilizzare la funzione di confronto strncmp() specificando esattamente 
- *       il numero di caratteri da confrontare.
- * 
- * PUBBLICAZIONE DI UN DATO SUI PUBLISHING TOPICS ---------------------------------------------
- * Anche la pubblicazione di un dato dalla ESP32 verso il broker viene gestita in modalità
- * asincrona dai layers della libreria MQTT.
- * Nella applicazione è sufficiente che il programmatore utilizzi il metodo mqttClient.publish()
- * ogni qual volta desidera pubblicare una informazione su un particolare topic.
- * 
- * Il metodo mqttClient.publish() richiede i seguenti parametri:
- *   il topic sul quale pubblicare, ad esempio "ESP32_base/output"
- *   il livello di QOS (ad esempio 0)
- *   se il messaggio è di tipo retain o no
- *   il payload da trasmettere (ad esempio un array di char contenente un testo)
- *   la dimensione in byte del payload
- * 
- * e ritorna il packet ID (diverso da 0) se è stato in grado di inserire il payload nella
- * coda dei messaggi da pubblicare verso il broker, altrimenti restituisce il codice di 
- * errore 0.
- * 
- * Ad esempio, per pubblicare lo stato del pulsante, il programmatore può scrivere:
- * 
- *   if (button.fell())
- *   {
- *     const char msgButton[] = "Pulsante premuto";
- *     Serial.println(msgButton);
- * 
- *     // pubblica sul topic outTopic
- *     if(mqttClient.connected()) {
- *       uint16_t res = 0;
- *       res = mqttClient.publish(publishedTopics.get("outTopic").c_str(),0,false, msgButton, strlen(msgButton));
- *     }
- *   }
- * 
- * Si osservi che il payload (l'informazione inviata sul canale definito dal topic) verrà trattata
- * dai layers di basso livello come array di byte. Pertanto il payload può anche essere un int, un float
- * o un tipo dati definito dall'utente, purché sia determinabile la sua dimensione in byte e che
- * il tipo dati sia "riconoscibile" e "gestibile" da chi riceverà l'informazione dall'altro lato del broker.
- * 
  * 
  * FUNZIONE SETUP() ---------------------------------------------------------------------------
  * Nella funzione setup() è importante rispettare la sequenza di operazioni:
