@@ -9,11 +9,11 @@ Dictionary<String, String> publishedTopics = Dictionary<String, String>();
 // compila il dizionario dei subscribed topics (da personalizzare)
 void compileSubTopics(Dictionary<String, String> &subTopics) {
   // subscribed topic di comando del led giallo  
-  subTopics.set("yellowTopic", thisClient "/yellowTopic");
+  subTopics.set("yellowOnOffTopic", thisClient "/yellowTopic");
   // subscribed topic di comando del led rosso
-  subTopics.set("redTopic", thisClient "/redTopic");
+  subTopics.set("redOnOffTopic", thisClient "/redTopic");
   // subscribed topic di comando del led blu
-  subTopics.set("blueTopic", thisClient "/blueTopic");
+  subTopics.set("blueOnOffTopic", thisClient "/blueTopic");
   // subscribed topic per stampa messaggi
   subTopics.set("inputTopic", thisClient "/input");
 }
