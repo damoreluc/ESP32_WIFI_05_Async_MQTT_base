@@ -16,6 +16,8 @@ void drivePWMRGB(char* data);
 void driveOnOffRed(char* data);
 // comanda on/off led verde a partire dal payload
 void driveOnOffGreen(char* data);
+// comanda on/off led blu a partire dal payload
+void driveOnOffBlue(char* data);
 // comanda on/off led giallo a partire dal payload
 void driveOnOffYellow(char* data);
 

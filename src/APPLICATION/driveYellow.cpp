@@ -2,7 +2,7 @@
 #include <HWCONFIG/hwConfig.h>
 
 // comanda on/off led giallo a partire dal payload
-void driveYellow(char *data)
+void driveOnOffYellow(char *data)
 {
     if (strncmp(data, "0", 1) == 0)
     {

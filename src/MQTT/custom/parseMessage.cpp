@@ -38,16 +38,8 @@ void parseMessage(char *topic, char *payload, AsyncMqttClientMessageProperties p
     // è arrivato un messaggio da blueOnOffTopic
     else if (strcmp(topic, subscribedTopics.get("blueOnOffTopic").c_str()) == 0)
     {
-        if (strncmp(data, "0", 1) == 0)
-        {
-            digitalWrite(pinBlue, LOW);
-            Serial.println("led blu spento");
-        }
-        else if (strncmp(data, "1", 1) == 0)
-        {
-            digitalWrite(pinBlue, HIGH);
-            Serial.println("led blu acceso");
-        }
+        // comanda on/off led blu a partire dal payload
+        driveOnOffBlue(data);
     }
 
     // comando pwm del led RGB
