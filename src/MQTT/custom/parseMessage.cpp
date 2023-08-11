@@ -18,9 +18,6 @@ void parseMessage(char *topic, char *payload, AsyncMqttClientMessageProperties p
 
     // da personalizzare
 
-    // print some information about the received message
-    printRcvMsg(topic, payload, properties, len, index, total);
-
     // comando del led giallo
     // è arrivato un messaggio da yellowOnOffTopic
     if (strcmp(topic, subscribedTopics.get("yellowOnOffTopic").c_str()) == 0)
