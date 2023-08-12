@@ -137,7 +137,7 @@ Ad esempio: si vuole notificare in remoto che un pulsante è stato premuto o ril
     * con percorso  `"ESP32_base/output"`
     * su questo topic la ESP32 invierà un messaggio sullo stato del pulsante
 
-3. per i subscribed topics, nella funzione `compilePubTopics()` aggiungere il topic al dizionario dei subscribed topics mediante il comando:
+3. per i subscribed topics, nella funzione `compileSubTopics()` aggiungere il topic al dizionario dei subscribed topics mediante il comando:
 
 ```C
    // subscribed topic di comando del led giallo  
