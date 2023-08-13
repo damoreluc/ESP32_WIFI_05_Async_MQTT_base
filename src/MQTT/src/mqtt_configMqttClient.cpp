@@ -10,7 +10,9 @@ void configMqttClient(const char *mqttServer, const int mqttPort, const char *mq
 // mqttClient.onUnsubscribe(onMqttUnsubscribe);  // optional
   mqttClient.onMessage(onMqttMessage);           // mandatory
   mqttClient.onPublish(onMqttPublish);           // optional (publishing acknowledged)
-
+  
+  // set Client ID
+  mqttClient.setClientId(thisClient);
   // set MQTT broker server
   mqttClient.setServer(mqttServer, mqttPort);
 
