@@ -3,9 +3,7 @@
 
 #include <Arduino.h>
 #include <dependencies/Dictionary/Dictionary.h>
-
-// MQTT client ID
-#define thisClient "ESP32_base"
+#include <MQTT/custom/clientID.h>
 
 //Dizionario dei subscribed topics (topic in ingresso alla ESP32)
 extern Dictionary<String, String> subscribedTopics;
