@@ -1,78 +1,79 @@
-# WiFi Esempio 05: <br>template di client MQTT con connessione a rete WiFi
+# WiFi Example 05: MQTT client template with WiFi network connection
 
-Il progetto è un modello base per realizzare un client MQTT. Va considerato come riferimento per progetti più articolati basati sul protocollo MQTT su ESP32.
+The project is a basic model for building an MQTT client. It should be considered as a reference for more complex projects based on the MQTT protocol on ESP32.
 
-Impiega la libreria `AsyncMqttClient` (link: https://github.com/OttoWinter/async-mqtt-client)
+It uses the library `AsyncMqttClient` (link: https://github.com/OttoWinter/async-mqtt-client)
 
-(vedi anche https://github.com/khoih-prog/AsyncMQTT_ESP32 con documentazione più completa)
+(see also https://github.com/khoih-prog/AsyncMQTT_ESP32 with more complete documentation)
 
-L'esempio accetta quattro subscribed topics:
+The sample accepts four subscribed topics:
 
-* `ESP32_base/yellowTopic`  per il comando del led giallo
-* `ESP32_base/redTopic`  per il comando del led rosso
-* `ESP32_base/blueTopic`  per il comando del led blu 
-* `ESP32_base/input`    per la stampa di un messaggio di testo sulla console seriale
+* `ESP32_base/yellowTopic`  to turn on/off a yellow led
+* `ESP32_base/redTopic`  to turn on/off a red led
+* `ESP32_base/blueTopic`  to turn on/off a blue led 
+* `ESP32_base/input`    to print a text message on the serial console
 
-e pubblica sul topic:
+and publish on the topic:
 
 * `ESP32_base/output`
 
-un testo che rappresenta lo stato attuale di un pulsante.
+a message that represents the current state of a button.
 
 ---
 
-## Cartella `\APPLICATION`
+## Folder `\APPLICATION`
 
-La cartella `\APPLICATION` è pensata per organizzare meglio il codice del progetto.<br>Inserire qui le funzioni ausiliarie specifiche per l'applicazione in sviluppo, ad esempio le callback di accensione e spegnimento dei led in funzione del contenuto del payload.
+The `\APPLICATION` folder The folder is designed to better organize your project code.<br>Enter here the auxiliary functions specific to the application under development, for example the callbacks to turn on and off the LEDs depending on the content of the payload.
 
----
-
-## CONFIGURAZIONE WIFI
-
-La scheda ESP32 è configurata come __STATION__ in una rete WiFi:
-
-* modificare il file `WIFI/credentials.h` con i propri `SSID` e `Password`
-
-Per il controllo dello stato della connessione vengono adoperati gli eventi dell'oggetto Wifi.
-
-Vengono gestite le situazioni di perdita di connessione mediante riconnessione automatica.
-
-Il pin `23` viene impiegato come uscita digitale per indicare la connessione all'access point wiFi. Per configurare un'altra posizione del led, modificare il parametro `pinWiFiConnected` nel file `HWCONFIG\hwConfig.h`
 
 ---
 
-## SINCRONIZZAZIONE DATA/ORA CON NTP SERVER
+## WIFI CONFIGURATION
 
-Viene utilizzato un server __NTP__ per la gestione di data e ora:
+The ESP32 board is configured as a __STATION__ on a WiFi network:
 
-* modificare il file `LOCALTIME/localTime.cpp` con i propri parametri NTP
+* edit the 'WIFI/credentials.h' file with your own 'SSID' and 'Password'
 
-Per la stampa di data e ora utilizzare la funzione `printLocalTime()`. 
+The WiFi object's events are used to check the connection status.
+
+Connection loss situations are handled by automatic reconnection.
+
+Pin '23' is used as a digital output to indicate connection to the WiFi access point. To configure another LED position, change the parameter 'pinWiFiConnected' in the file 'HWCONFIG\hwConfig.h'
 
 ---
 
-## CONFIGURAZIONE DEL BROKER MQTT DA IMPIEGARE
+## DATE/TIME SYNCHRONIZATION WITH NTP SERVER
 
-Sono predefiniti tre broker MQTT tramite i rispettivi file di configurazione:
+A __NTP__ server is used to manage the date and time:
+
+* edit the file 'LOCALTIME/LOCALTime.cpp' with your own NTP parameters
+
+For date and time printing use the 'printLocalTime()' function.
+
+---
+
+## CONFIGURING THE MQTT BROKER TO USE
+
+Three MQTT brokers are predefined via their configuration files:
 
 * `MQTT/broker/mosquitto.h`
 * `MQTT/broker/raspi4.h`
 * `MQTT/broker/shiftr_io.h`
 
-ed è possibile aggiungerne altri rispettando il formato del file ed il nome delle variabili:
+and you can add others respecting the file format and the name of the variables:
 
 ```C
 #ifndef __NOMEBROKER_H
 #define __NOMEBROKER_H
-  // parametri di accesso per il broker NOMEBROKER MQTT
-  const char *mqttServer = "IP_o_url_del_broker_MQTT";
+  // Access parameters for the broker NOMEBROKER MQTT
+  const char *mqttServer = "MQTT_broker_IP_Address_or_url";
   const int mqttPort = 1883;
-  const char *mqttUser = "eventuale_username_di_accesso_al_broker";
-  const char *mqttPassword = "eventuale_password_di_accesso_al_broker";
+  const char *mqttUser = "possible_username_to_access_the_broker";
+  const char *mqttPassword = "possible_password_to_access_the_broker";
 #endif
 ```
 
-Nel file `main.cpp` includere __il solo__ file prescelto di accesso al broker, ad esempio:
+In the 'main.cpp' file, include __only__ the chosen broker login file, for example:
 
 ```C
  // your MQTT Broker:
@@ -82,170 +83,167 @@ Nel file `main.cpp` includere __il solo__ file prescelto di accesso al broker, a
  // #include <MQTT/broker/mosquitto.h>
 ```
 
-__IMPORTANTE__: __NON__ includere più di un file di definizione del broker.
+__IMPORTANT__: __Do NOT__ include more than one broker definition file
 
-## DEFINIZIONE DEI SUBSCRIBED E DEI PUBLISHING TOPICS
+##  SUBSCRIBED AND PUBLISHING TOPICS DEFINITION
 
-In base all'applicazione da creare, vanno definiti i _topics_ a cui il client deve iscriversi per ricevere dati o comandi da remoto.
+Depending on the application to be created, you must define the _topics_ to which the client must subscribe to receive data or commands remotely.
 
-Il client MQTT deve possedere un nome __univoco__ sul broker. Nel file `MQTT\custom\mqtt_topics.h`
-viene dichiarato il nome univoco, che è possibile personalizzare:
+The MQTT client must have a __unique__ name on the broker. The unique name is declared in file 'MQTT\custom\mqtt_topics.h', which you can customize:
 
 ```C
   // MQTT client ID
   #define thisClient "ESP32_base"
 ```
 
-Vanno poi definiti i topic sui quali il client pubblica dati verso il broker.
+The topics on which the client publishes data to the broker must then be defined.
 
-Allo scopo vengono impiegati due dizionari:
+Two dictionaries are used for this purpose:
 
-* per i _subscribed topics_ ("ingressi" per il client):  `subscribedTopics`
-* per i _publishing topics_ ("uscite" del client):  `publishedTopics`
+* for _subscribed topics_ ("inputs" for the client):  `subscribedTopics`
+* for _publishing topics_ ("outputs" for the client):  `publishedTopics`
 
-Entrambi i dizionari hanno la struttura:  `<chiave>, <valore>` entrambe le voci sono di tipo `String`.
+Both dictionaries have the structure: `<key>, <value>` both entries are of type 'String'.
 
-* Con `<chiave>` si indica un nome semplice da assegnare al topic
-* Il `<valore>` contiene il _persorso logico_ del topic.
+* `<key>` indicates a simple name to be assigned to the topic
+* The '<value>' contains the _logical path_ of the topic.
 
+Customization must be done in the file 'MQTT\custom\mqtt_topics.cpp'
 
-La personalizzazione va svolta nel file `MQTT\custom\mqtt_topics.cpp`
-
-* Per i topic in ingresso (_Subscribed topics_) modificare la funzione:
+* For incoming topics (_Subscribed topics_) change the function:
 
 ```C
   void compileSubTopics(Dictionary<String, String> &subTopics)
 ```
 
-* Per i topic in uscita (_Published topics_) modificare la funzione:
+* For outgoing topics (_Published topics_) change the function:
 
 ```C
   void compilePubTopics(Dictionary<String, String> &pubTopics)
 ```
 
-__Procedere nell'ordine:__
+__Proceed in order:__
 
-1. definire quali informazioni la scheda ESP32 dovrà ricevere dal broker e associare i subscribed topics, definendo un nome univoco (chiave) per ciascun topic e il suo percorso sul broker.<br>
-Ad esempio: si vuole accendere/spegnere da remoto un led giallo collegato alla ESP32;
-    * si definisce il _subscribed topic_ con nome (chiave) `"yellowOnOffTopic"`
-    * con percorso  `"ESP32_base/yellowTopic"` 
-    * da questo topic arriverà la stringa `"0"` per spegnere il led, o la stringa `"1"` per accenderlo.
+1. define what information the ESP32 board should receive from the broker and associate subscribed topics, defining a unique name (key) for each topic and its path on the broker.<br>
+For example: you want to remotely turn on/off a yellow LED connected to the ESP32;
+    * define the _subscribed topic_ as (key) `"yellowOnOffTopic"`
+    * with logical path  `"ESP32_base/yellowTopic"` 
+    * From this topic will come the string `"0"` to turn off the LED, or the string `"1"` to turn it on.
 
-2. in modo simile, definire quali informazioni la scheda ESP32 pubblicherà verso il broker e associare i publisher topics, definendo un nome univoco per ciascun topic e il suo percorso sul broker.<br>
-Ad esempio: si vuole notificare in remoto che un pulsante è stato premuto o rilasciato;
-    * si definisce il _published topic_ con nome `"outTopic"`
-    * con percorso  `"ESP32_base/output"`
-    * su questo topic la ESP32 invierà un messaggio sullo stato del pulsante
+2. similarly, define what information the ESP32 will publish to the broker and associate publisher topics, defining a unique name for each topic and its path on the broker.<br>
+For example: You want to remotely notify that a button has been pressed or released;
+    * define the _published topic_ as (key) `"outTopic"`
+    * with logical path  `"ESP32_base/output"`
+    * on this topic the ESP32 will send a message about the status of the button
 
-3. per i subscribed topics, nella funzione `compileSubTopics()` aggiungere il topic al dizionario dei subscribed topics mediante il comando:
+3. For subscribed topics, in the `compileSubTopics()` function add the topic to the subscribed topics dictionary using the command:
 
 ```C
-   // subscribed topic di comando del led giallo  
+   // Yellow LED control subscribed topic 
    subTopics.set("yellowOnOffTopic", thisClient "/yellowTopic");
 ```
 
-4. ripetere il punto 3. per ciascun _subscribed topic_ richiesto dalla applicazione
-5. per i _publishing topic_, nella funzione `compilePubTopics()` aggiungere il topic al dizionario dei published topics mediante il comando:
+4. Repeat step 3. for each _subscribed topic_ required by the application
+5. for _publishing topic_, in the function `compilePubTopics()` add the topic to the dictionary of published topics using the command:
 
 ```C
-   // topic di pubblicazione messaggi
+   // Message Publishing Topic
    pubTopics.set("outTopic", thisClient "/output");
 ```
 
- 6. ripetere il punto 5. per ciascun _published topic_ richiesto dalla applicazione.
+ 6. Repeat step 5. for each _published topic_ required by the application.
 
-All'avvio del client MQTT verranno automaticamente registrati sul broker i subscribed topics.
+When the MQTT client starts, subscribed topics will be automatically registered on the broker.
 
-## PARSING DEI SUBSCRIBED TOPICS
+## PARSING OF SUBSCRIBED TOPICS
 
-Il client MQTT gestisce il traffico col broker in modo _asincrono_, non è necessario che il programmatore della applicazione si preoccupi delle fasi di ricezione o di trasmissione dei dati sui topics.
+The MQTT client handles traffic with the broker in _asynchronous mode_, so it is not necessary for the application programmer to worry about the phases of receiving or transmitting data on the topics.
 
-E' invece __responsabilità del programmatore__ decidere cosa fare quando viene ricevuto un messaggio su un subscribed topic.
+Instead, it is the __programmer's responsibility__ to decide what to do when a message is received on a subscribed topic.
 
-Nel file     `MQTT\custom\parseMessage.cpp`
+In the `MQTT\custom\parseMessage.cpp`  file
 
-va personalizzata la funzione    `parseMessage()`
+the function `parseMessage()`  must be customized.
 
-Rifacendosi al caso del led giallo illustrato più sopra, nella `parseMessage()` si andrà a:
+Referring to the case of the yellow LED shown above, in the `parseMessage()` function:
 
-1. verificare se si tratta del __topic__ descritto dalla chiave `"yellowOnOffTopic"` allora si passa il contenuto del payload alla funzione ausiliaria __programmata dallo sviluppatore__ che gestirà l'informazione:
+1. you will check if it is the __topic__ described by the key `"yellowOnOffTopic"`. If so, then you pass the content of the payload to the auxiliary function __programmed by the developer__ that will manage the information:
 
 ```C
-// operazioni da eseguire quando viene ricevuto un messaggio
-// viene richiamata da mqtt_onMqttMessage()
+// What to do when a message is received
+// it is called by mqtt_onMqttMessage() function
 void parseMessage(char *topic, char *payload, AsyncMqttClientMessageProperties properties, size_t len, size_t index, size_t total)
 {
-    // bonifica del payload
-    // estrae solo i primi len caratteri del payload
+    // Payload cleanup
+    // extracts only the first `len` characters of the payload
     char data[len + 1];
     strncpy(data, payload, len);
 
     // print some information about the received message
     printRcvMsg(topic, payload, properties, len, index, total);
 
-    // da personalizzare
+    // to be customized
 
-    // comando del led giallo
-    // è arrivato un messaggio da yellowOnOffTopic
+    // Yellow LED control
+    // a message has arrived from yellowOnOffTopic
     if (strcmp(topic, subscribedTopics.get("yellowOnOffTopic").c_str()) == 0)
     {
-        // comanda on/off led giallo a partire dal payload
+        // Controls on/off yellow LED from payload
         driveOnOffYellow(data);
     }
 }
 ```
 
-2. nella funzione ausiliaria, se il __payload__ è la stringa `"0"` viene comandato lo spegnimento del led giallo altrimenti se il __payload__ è la stringa `"1"` viene comandata l'accensione del led giallo.
+2. in the auxiliary function, if the __payload__ is the string `"0"` then the yellow led is driven off; otherwise, if the __payload__ is the string `"1"` then the yellow led is driven on.
 
-La struttura del codice corrispondente è:
+The corresponding code structure is:
 
 ```C
 #include <APPLICATION/application.h>
 #include <HWCONFIG/hwConfig.h>
 
-// comanda on/off led giallo a partire dal payload
+// Controls on/off yellow LED from payload
 void driveOnOffYellow(char *data)
 {
     if (strncmp(data, "0", 1) == 0)
     {
         digitalWrite(pinYellow, LOW);
-        Serial.println("led giallo spento");
+        Serial.println("Yellow LED turned off");
     }
     else if (strncmp(data, "1", 1) == 0)
     {
         digitalWrite(pinYellow, HIGH);
-        Serial.println("led giallo acceso");
+        Serial.println("Yellow LED turned on");
     }
 }
 ```
 
-__NOTA__: nelle operazioni di confronto tra stringhe del payload (trattate come _array di char_) è consigliato utilizzare la funzione di confronto `strncmp()` specificando esattamente il numero di caratteri da confrontare.
+__NOTE__: In payload string comparison operations (treated as _char array_) it is recommended to use the `strncmp()` comparison function specifying exactly the number of characters to be compared.
 
-## PUBBLICAZIONE DI UN DATO SUI PUBLISHING TOPICS
+## PUBLICATION OF DATA ON PUBLISHING TOPICS
 
-Anche la pubblicazione di un dato dalla ESP32 verso il broker viene gestita in modalità asincrona dai layers della libreria MQTT.
+Even the publication of a data from ESP32 to the broker is managed asynchronously by the layers of the MQTT library.
 
-Nella applicazione è sufficiente che il programmatore utilizzi il metodo `mqttClient.publish()` ogni qual volta desidera pubblicare una informazione su un particolare topic.
+In the application, it is sufficient for the programmer to use the `mqttClient.publish()` method whenever he wants to publish information about a particular topic.
+The `mqttClient.publish()` method requires the following parameters:
 
-Il metodo `mqttClient.publish()` richiede i seguenti parametri:
+* the topic on which to publish, for example `"ESP32_base/output"`
+* the required QOS level (for example, 0)
+* whether the message is a retain message or not
+* the payload to be transmitted (for example, a char array containing text)
+* the size _in byte_ of the payload
 
-* il topic sul quale pubblicare, ad esempio `"ESP32_base/output"`
-* il livello di QOS (ad esempio 0)
-* se il messaggio è di tipo retain o no
-* il payload da trasmettere (ad esempio un array di char contenente un testo)
-* la dimensione _in byte_ del payload
+and returns the _packet ID_ (other than 0) of the message if it was able to put the payload in the queue of messages to be published to the broker, otherwise it returns error code 0.
 
-e ritorna il _packet ID_ (diverso da 0) del messaggio se è stato in grado di inserire il payload nella coda dei messaggi da pubblicare verso il broker, altrimenti restituisce il codice di errore 0.
-
-Ad esempio, per pubblicare lo stato del pulsante, il programmatore può scrivere:
+For example, to publish the status of the button, the programmer can write:
 
 ```C
   if (button.fell())
   {
-    const char msgButton[] = "Pulsante premuto";
+    const char msgButton[] = "Button pressed";
     Serial.println(msgButton);
 
-    // pubblica sul topic outTopic
+    // publish on topic outTopic
     if(mqttClient.connected()) {
       uint16_t res = 0;
       res = mqttClient.publish(publishedTopics.get("outTopic").c_str(),0,false, msgButton, strlen(msgButton));
@@ -253,16 +251,16 @@ Ad esempio, per pubblicare lo stato del pulsante, il programmatore può scrivere
   }
 ```
 
-Si osservi che il payload (l'informazione inviata sul canale definito dal topic) verrà trattata dai layers di basso livello come __array di byte__. Pertanto il payload può anche essere un `int`, un `float` o un tipo dati definito dall'utente, purché sia determinabile la sua dimensione in byte e che il tipo dati sia _riconoscibile_ e _gestibile_ da chi riceverà l'informazione dall'altro lato del broker.
+Note that the payload (the information sent on the channel defined by the topic) will be treated by low-level layers as __array of byte__. Therefore, the payload can also be an `int`, a `float` or a user-defined data type, as long as its size in bytes can be determined and the data type is _recognizable_ and _manageable_ by those who will receive the information on the other side of the broker.
 
 ---
 
-## FUNZIONE SETUP()
+## THE SETUP() FUNCTION
 
-Nella funzione `setup()` è importante rispettare la sequenza di operazioni:
+In the `setup()` function it is important to respect the sequence of operations:
 
-1. configurare tutti i dispositivi hardware
-2. assegnare i valori predefiniti a variabili/oggetti della applicazione
-3. creare eventuali task RTOS
-4. configurare il client MQTT con `configMqttClient(mqttServer, mqttPort, mqttUser, mqttPassword);`
-5. avviare il sotto sistema WiFi con `initWiFi_STA();`
+1. configure all hardware devices
+2. assign default values to application variables/objects
+3. create any RTOS tasks
+4. configure the MQTT client with `configMqttClient(mqttServer, mqttPort, mqttUser, mqttPassword);`
+5. start the WiFi subsystem with `initWiFi_STA();`
