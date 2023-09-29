@@ -3,5 +3,5 @@
 .vscode/c_cpp_properties.json
 .vscode/launch.json
 .vscode/ipch
-src\WIFI\credentials.h
+src/WIFI/credentials.h
 note.txt
