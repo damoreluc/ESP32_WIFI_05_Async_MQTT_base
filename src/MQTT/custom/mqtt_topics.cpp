@@ -1,25 +1,25 @@
 #include <MQTT/custom/mqtt_topics.h>
 
-//Dizionario dei subscribed topics (topic in ingresso alla ESP32)
+// Dictionary of subscribed topics (ESP32 incoming topic)
 Dictionary<String, String> subscribedTopics = Dictionary<String, String>();
 
-//Dizionario dei published topics (topic in uscita dalla ESP32)
+// Dictionary of published topics (topic coming out of ESP32)
 Dictionary<String, String> publishedTopics = Dictionary<String, String>();
 
-// compila il dizionario dei subscribed topics (da personalizzare)
+// Compile the dictionary of subscribed topics (to be customized)
 void compileSubTopics(Dictionary<String, String> &subTopics) {
-  // subscribed topic di comando del led giallo  
+  // Yellow LED control subscribed topic  
   subTopics.set("yellowOnOffTopic", thisClient "/yellowTopic");
-  // subscribed topic di comando del led rosso
+  // Red LED control subscribed topic
   subTopics.set("redOnOffTopic", thisClient "/redTopic");
-  // subscribed topic di comando del led blu
+  // Blue LED control subscribed topic
   subTopics.set("blueOnOffTopic", thisClient "/blueTopic");
-  // subscribed topic per stampa messaggi
+  // Subscribed topic for printing messages
   subTopics.set("inputTopic", thisClient "/input");
 }
 
-// compila il dizionario dei published topics (da personalizzare)
+// Compile the dictionary of published topics (to be customized)
 void compilePubTopics(Dictionary<String, String> &pubTopics) {
-  // topic di pubblicazione messaggi
+  // Message Publishing Topic
   pubTopics.set("outTopic", thisClient "/output");
 }

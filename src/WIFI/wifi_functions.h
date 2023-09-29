@@ -5,27 +5,26 @@
 #include <WIFI/credentials.h>
 #include <WiFi.h>
 
-// configura il modulo WiFi come STATION
-// e si connette ad un Access Point con le credenziali
-// definite nel file credentials.h
+// configure the WiFi module as a STATION and connects to an Access Point
+// with credentials defined in the credentials.h file
 void initWiFi_STA();
 
-// Gestione degli eventi del WiFi
+// WiFi Event Management
 void WiFiEvent(WiFiEvent_t event);
 
-// Stampa l'indirizzo IP ottenuto
+// Print the obtained IP address
 void WiFiGotIP(WiFiEvent_t event, WiFiEventInfo_t info);
 
-// Stampa la conferma di connessione all'access point
+// Print the access point connection confirmation
 void WiFiStationConnected(WiFiEvent_t event, WiFiEventInfo_t info);
 
-// Gestione della disconnessione e tentativo di riconnessione
+// Managing disconnection and attempting to reconnect
 void WiFiStationDisconnected(WiFiEvent_t event, WiFiEventInfo_t info);
 
-// Operazioni dei layer superiori da compiere quando è pronto il layer IP
+// Top layer operations to perform when the IP layer is ready
 void WiFiNetworkReady();
 
-// Operazioni da compiere sui layers superiori se il layer IP è caduto
+// Operations to be performed on the upper layers if the IP layer has fallen
 void WiFiNetworkFail();
 
 #endif

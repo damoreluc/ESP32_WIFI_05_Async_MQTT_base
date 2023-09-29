@@ -1,17 +1,17 @@
 #include <APPLICATION/application.h>
 #include <HWCONFIG/hwConfig.h>
 
-// comanda on/off led giallo a partire dal payload
+// Control on/off yellow LED from payload
 void driveOnOffYellow(char *data)
 {
     if (strncmp(data, "0", 1) == 0)
     {
         digitalWrite(pinYellow, LOW);
-        Serial.println("led giallo spento");
+        Serial.println("Yellow LED off");
     }
     else if (strncmp(data, "1", 1) == 0)
     {
         digitalWrite(pinYellow, HIGH);
-        Serial.println("led giallo acceso");
+        Serial.println("Yellow LED off");
     }
 }

@@ -9,7 +9,7 @@
 #define pinRed 17
 #define pinBlue 18
 
-// indicatore stato connessione WiFi
+// WiFi connection status indicator
 #define pinWiFiConnected 23
 
 #endif

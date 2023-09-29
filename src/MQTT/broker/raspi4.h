@@ -1,7 +1,7 @@
 #ifndef __RASPI4_H
 #define __RASPI4_H
 /*
- * parametri di accesso per il broker MQTT su Raspberry Pi4
+ * Access parameters for the broker MQTT on Raspberry Pi4
  */
 // mqtt://tinytracker314:EJeSDjwY7AfDyFvE@192.168.0.46
 

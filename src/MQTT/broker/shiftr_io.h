@@ -1,7 +1,7 @@
 #ifndef __SHIFTRIO_H
 #define __SHIFTRIO_H
 /*
- * parametri di accesso per il broker shiftr.io
+ * Access parameters for the broker shiftr.io
  */
 const char *mqttServer = "item2122a.cloud.shiftr.io";
 const int mqttPort = 1883;

@@ -2,12 +2,12 @@
 #include <HWCONFIG/hwConfig.h>
 
 void initWiFi_STA() {
-  // comanda un led per indicare la connessione all'access point WiFi
+  // controls an LED to indicate the connection to the WiFi access point
   pinMode(pinWiFiConnected, OUTPUT);
 
   WiFi.mode(WIFI_STA);
 
-  // gestione degli eventi WiFi
+  // WiFi event management
   WiFi.onEvent(WiFiEvent, WiFiEvent_t::ARDUINO_EVENT_MAX);
  // WiFi.onEvent(WiFiStationConnected, WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_CONNECTED);
  // WiFi.onEvent(WiFiGotIP, WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_GOT_IP);

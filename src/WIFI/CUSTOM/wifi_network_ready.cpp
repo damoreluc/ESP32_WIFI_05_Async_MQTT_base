@@ -3,7 +3,7 @@
 #include <LOCALTIME/localTime.h>
 #include <MQTT/mqtt_functions.h>
 
-// Operazioni dei layer superiori da compiere quando è pronto il layer IP
+// Top layer operations to perform when the IP layer is ready
 void WiFiNetworkReady()
 {
     digitalWrite(pinWiFiConnected, HIGH);

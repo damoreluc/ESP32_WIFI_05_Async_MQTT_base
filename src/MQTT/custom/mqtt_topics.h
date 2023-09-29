@@ -5,17 +5,16 @@
 #include <dependencies/Dictionary/Dictionary.h>
 #include <MQTT/custom/clientID.h>
 
-//Dizionario dei subscribed topics (topic in ingresso alla ESP32)
+// Dictionary of subscribed topics (ESP32 incoming topic)
 extern Dictionary<String, String> subscribedTopics;
 
-//Dizionario dei published topics (topic in uscita dalla ESP32)
+// Dictionary of published topics (topic coming out of ESP32)
 extern Dictionary<String, String> publishedTopics;
 
-// compila il dizionario dei subscribed topics (da personalizzare)
+// Compile the dictionary of subscribed topics (to be customized)
 void compileSubTopics(Dictionary<String, String> &subTopics);
 
-// compila il dizionario dei published topics (da personalizzare)
+// Compile the dictionary of published topics (to be customized)
 void compilePubTopics(Dictionary<String, String> &pubTopics);
-
 
 #endif

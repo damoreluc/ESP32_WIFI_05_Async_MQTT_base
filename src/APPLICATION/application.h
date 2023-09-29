@@ -3,11 +3,11 @@
 
 #include <Arduino.h>
 
-// comanda on/off led rosso a partire dal payload
+// Control on/off red LED from payload
 void driveOnOffRed(char* data);
-// comanda on/off led giallo a partire dal payload
+// Control on/off yellow LED from payload
 void driveOnOffYellow(char* data);
-// comanda on/off led blu a partire dal payload
+// Control on/off blue LED from payload
 void driveOnOffBlue(char* data);
 
 #endif

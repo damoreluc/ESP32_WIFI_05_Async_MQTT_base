@@ -23,7 +23,7 @@ a message that represents the current state of a button.
 
 ## Folder `\APPLICATION`
 
-The `\APPLICATION` folder The folder is designed to better organize your project code.<br>Enter here the auxiliary functions specific to the application under development, for example the callbacks to turn on and off the LEDs depending on the content of the payload.
+The `\APPLICATION` folder is designed to better organize your project code.<br>Enter here the auxiliary functions specific to the application under development, for example the callbacks to turn on and off the LEDs depending on the content of the payload.
 
 
 ---
@@ -63,13 +63,13 @@ Three MQTT brokers are predefined via their configuration files:
 and you can add others respecting the file format and the name of the variables:
 
 ```C
-#ifndef __NOMEBROKER_H
-#define __NOMEBROKER_H
+#ifndef __BROKERNAME_H
+#define __BROKERNAME_H
   // Access parameters for the broker NOMEBROKER MQTT
   const char *mqttServer = "MQTT_broker_IP_Address_or_url";
   const int mqttPort = 1883;
-  const char *mqttUser = "possible_username_to_access_the_broker";
-  const char *mqttPassword = "possible_password_to_access_the_broker";
+  const char *mqttUser = "username_to_access_the_broker";
+  const char *mqttPassword = "password_to_access_the_broker";
 #endif
 ```
 
@@ -85,7 +85,7 @@ In the 'main.cpp' file, include __only__ the chosen broker login file, for examp
 
 __IMPORTANT__: __Do NOT__ include more than one broker definition file
 
-##  SUBSCRIBED AND PUBLISHING TOPICS DEFINITION
+## SUBSCRIBED AND PUBLISHING TOPICS DEFINITION
 
 Depending on the application to be created, you must define the _topics_ to which the client must subscribe to receive data or commands remotely.
 
@@ -106,7 +106,7 @@ Two dictionaries are used for this purpose:
 Both dictionaries have the structure: `<key>, <value>` both entries are of type 'String'.
 
 * `<key>` indicates a simple name to be assigned to the topic
-* The '<value>' contains the _logical path_ of the topic.
+* The `<value>` contains the _logical path_ of the topic.
 
 Customization must be done in the file 'MQTT\custom\mqtt_topics.cpp'
 

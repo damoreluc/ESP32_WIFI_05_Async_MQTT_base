@@ -1,7 +1,7 @@
 #include <WIFI/wifi_functions.h>
 #include <HWCONFIG/hwConfig.h>
 
-// tabella dei codici reason in:
+// Reason codes table in:
 // https://community.cisco.com/t5/wireless-mobility-knowledge-base/802-11-association-status-802-11-deauth-reason-codes/ta-p/3148055
 void WiFiStationDisconnected(WiFiEvent_t event, WiFiEventInfo_t info)
 {

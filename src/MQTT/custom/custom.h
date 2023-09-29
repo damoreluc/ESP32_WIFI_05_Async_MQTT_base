@@ -2,18 +2,18 @@
 #define __CUSTOM_H
 
 #include <MQTT/mqtt_functions.h>
-// funzioni da personalizzare in base al progetto
+// Functions to customize according to the project
 
-// carica la lista dei topics che si vogliono sottoscrivere
-// Viene richiamata nella configMqttClient()
+// Upload the list of topics you want to subscribe to
+// It is invoked in the configMqttClient()
 void topicsToSubscribe();
 
-// carica la lista dei topics su cui si andrà a pubblicare
-// Viene richiamata nella configMqttClient()
+// Upload the list of topics on which you will publish
+// It is invoked in the configMqttClient()
 void topicsToPublish();
 
-// operazioni da eseguire quando viene ricevuto un messaggio
-// viene richiamata da mqtt_onMqttMessage()
+// What to do when a message is received
+// It is invoked by mqtt_onMqttMessage()
 void parseMessage(char *topic, char *payload, AsyncMqttClientMessageProperties properties, size_t len, size_t index, size_t total);
 
 #endif
