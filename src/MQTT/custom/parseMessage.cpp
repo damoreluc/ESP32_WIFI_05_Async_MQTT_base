@@ -12,7 +12,7 @@ void parseMessage(char *topic, char *payload, AsyncMqttClientMessageProperties p
     // In a dynamic buffer, it extracts only the first len characters of the payload
     char *data = (char *)malloc((len + 1) * sizeof(char));
     strncpy(data, payload, len);
-    // data given is a string in C: you have to end it with the terminator '\0'
+    // data is a C string: you have to end it with the terminator '\0'
     data[len] = '\0';
 
     // print some information about the received message
