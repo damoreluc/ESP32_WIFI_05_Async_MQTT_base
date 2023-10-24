@@ -8,10 +8,12 @@
 // It is invoked by mqtt_onMqttMessage()
 void parseMessage(char *topic, char *payload, AsyncMqttClientMessageProperties properties, size_t len, size_t index, size_t total)
 {
-    // Payload cleanup
-    // extracts only the first len characters from the payload
-    char data[len + 1];
+    // payload clean up
+    // In a dynamic buffer, it extracts only the first len characters of the payload
+    char *data = (char *)malloc((len + 1) * sizeof(char));
     strncpy(data, payload, len);
+    // data given is a string in C: you have to end it with the terminator '\0'
+    data[len] = '\0';
 
     // print some information about the received message
     printRcvMsg(topic, payload, properties, len, index, total);
